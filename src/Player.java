@@ -15,11 +15,13 @@ public class Player {
 
     private boolean containsAce;
 
-    private boolean bustForThisRound;
+    private boolean isBustThisRound;
+
+    private boolean continueBetThisRound;
 
 
     public Player(String name, int money, int betForThisRound, List<Card> cardList, int cardScore, int cardAlternateScore,
-                  boolean isBanker, boolean betInThisRound, boolean containsAce, boolean bustForThisRound) {
+                  boolean isBanker, boolean continueBetThisRound, boolean containsAce, boolean isBustThisRound) {
         this.name = name;
         this.money = money;
         this.betForThisRound = betForThisRound;
@@ -28,16 +30,16 @@ public class Player {
         this.cardAlternateScore = cardAlternateScore;
         this.isBanker = isBanker;
         this.containsAce = containsAce;
-        this.betInThisRound = betInThisRound;
-        this.bustForThisRound = bustForThisRound;
+        this.continueBetThisRound = continueBetThisRound;
+        this.isBustThisRound = isBustThisRound;
     }
 
-    public boolean isBustForThisRound() {
-        return bustForThisRound;
+    public boolean isBustThisRound() {
+        return isBustThisRound;
     }
 
-    public void setBustForThisRound(boolean bustForThisRound) {
-        this.bustForThisRound = bustForThisRound;
+    public void setBustThisRound(boolean bustThisRound) {
+        isBustThisRound = bustThisRound;
     }
 
     public int getCardAlternateScore() {
@@ -56,15 +58,13 @@ public class Player {
         this.containsAce = containsAce;
     }
 
-    public boolean isBetInThisRound() {
-        return betInThisRound;
+    public boolean isContinueBetThisRound() {
+        return continueBetThisRound;
     }
 
-    public void setBetInThisRound(boolean betInThisRound) {
-        this.betInThisRound = betInThisRound;
+    public void setContinueBetThisRound(boolean continueBetThisRound) {
+        this.continueBetThisRound = continueBetThisRound;
     }
-
-    private boolean betInThisRound;
 
     public List<Card> getCardList() {
         return cardList;
