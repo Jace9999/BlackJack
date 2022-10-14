@@ -11,35 +11,82 @@ public class Deck {
 
     private boolean startBank;
 
+    private int alivePlayer;
+
+    private int roundNumber;
+
     public Deck() {
-        noOneBet = false;
-        startBank = false;
-        round1 = true;
         this.cardList = new ArrayList<>();
         this.playerList = new ArrayList<>();
+        roundNumber = 1;
         initialCards();
         reshuffledCards();
         initialPlayer();
-        while(!noOneBet){
-            noOneBet = true;
-            sendCardForPlayer();
-            round1 = false;
-        }
+        this.alivePlayer = this.playerList.size();
+        while(alivePlayer > 2){
+            System.out.println();
+            System.out.println("Start round " + roundNumber);
+            roundNumber++;
+            noOneBet = false;
+            startBank = false;
+            round1 = true;
+            while (!noOneBet) {
+                noOneBet = true;
+                sendCardForPlayer();
+                round1 = false;
+            }
 
-        startBank = true;
-        while(this.banker.isContinueBetThisRound()){
-            sendCardForPlayer();
+            startBank = true;
+            while (this.banker.isContinueBetThisRound()) {
+                sendCardForPlayer();
+            }
+            dealWithContainsAcePlayer();
+            beatWithBanker();
+            if (banker.isBustThisRound()) {
+                System.out.println(banker.getName() + " is the banker, he bust in this round, his current money is " + banker.getMoney());
+            } else {
+                System.out.println(banker.getName() + " is the banker, his card score is " + banker.getCardScore() + " and his current money is " + banker.getMoney());
+            }
+            alivePlayer = 0;
+            reset();
+            pickRichestPlayerAsBanker();
         }
-//        printCardSumForPlayer();
-//        printBankerCardSum();
-        dealWithContainsAcePlayer();
-        beatWithBanker();
-        if(banker.isBustThisRound()){
-            System.out.println(banker.getName() + " is the banker, he bust in this round");
-        }else{
-            System.out.println(banker.getName() + " is the banker, his card score is " + banker.getCardScore());
-        }
+    }
 
+    public void reset(){
+        for (Player player : this.playerList){
+            if(player.getMoney() > 0){
+                alivePlayer++;
+                player.setContainsAce(false);
+                player.setCardScore(0);
+                player.setBustThisRound(false);
+                player.setContinueBetThisRound(true);
+                player.setCardList(new ArrayList<>());
+                player.setCardAlternateScore(0);
+            }else{
+                player.setContinueBetThisRound(false);
+            }
+            player.setBanker(false);
+            player.setBetForThisRound(0);
+        }
+        if(this.cardList.size() < 40){
+            this.cardList = new ArrayList<>();
+            this.initialCards();
+            this.reshuffledCards();
+        }
+    }
+
+    public void pickRichestPlayerAsBanker(){
+        Player richest = null;
+        int maxMoney = 0;
+        for(Player player : playerList){
+            if(player.getMoney() > maxMoney){
+                richest = player;
+                maxMoney = player.getMoney();
+            }
+        }
+        this.banker = richest;
+        this.banker.setBanker(true);
     }
 
     public void dealWithContainsAcePlayer(){
@@ -55,31 +102,35 @@ public class Deck {
     public void beatWithBanker(){
         if(this.banker.isBustThisRound()){
             for(Player player : this.playerList){
-                if(!player.isBanker() ){
+                if(!player.isBanker() && player.getBetForThisRound() > 0){
                     int betForThisRound = player.getBetForThisRound();
-                    if(player.getBetForThisRound() > 0 && !player.isBustThisRound()){
+                    if(!player.isBustThisRound()){
                         player.setMoney(player.getMoney() + betForThisRound);
                         banker.setMoney(banker.getMoney() - betForThisRound);
-                    }else if(player.getBetForThisRound() > 0 && player.isBustThisRound()){
+                        System.out.println(player.getName() + " score is " + player.getCardScore() + " win, his current money is " + player.getMoney());
+                    }else{
                         player.setMoney(player.getMoney() - betForThisRound);
                         banker.setMoney(banker.getMoney() + betForThisRound);
+                        System.out.println(player.getName() + " bust in this round， his score is " + player.getCardScore() + " lose, his current money is " + player.getMoney());
                     }
                 }
             }
         }else{
             for(Player player : this.playerList){
-                if(!player.isBanker()){
+                if(!player.isBanker() && player.getBetForThisRound() > 0){
                     int betForThisRound = player.getBetForThisRound();
                     if(player.isBustThisRound()){
                         player.setMoney(player.getMoney() - betForThisRound);
                         banker.setMoney(banker.getMoney() + betForThisRound);
+                        System.out.println(player.getName() + " bust in this round， his score is " + player.getCardScore() + " lose, his current money is " + player.getMoney());
                     }else if(banker.getCardScore() >= player.getCardScore()){
-
                         player.setMoney(player.getMoney() - betForThisRound);
                         banker.setMoney(banker.getMoney() + betForThisRound);
-                    }else{
+                        System.out.println(player.getName() + " score is " + player.getCardScore() + " lose, his current money is " + player.getMoney());
+                    }else if(banker.getCardScore() < player.getCardScore()){
                         player.setMoney(player.getMoney() + betForThisRound);
                         banker.setMoney(banker.getMoney() - betForThisRound);
+                        System.out.println(player.getName() + " score is " + player.getCardScore() + " win, his current money is " + player.getMoney());
                     }
                 }
             }
@@ -89,16 +140,29 @@ public class Deck {
 
     public void sendCardForPlayer(){
         for(Player player : this.playerList){
-            if(round1 || (player.isContinueBetThisRound() && !player.isBanker() && player.getBetForThisRound() > 0)){
-                Card card = this.cardList.remove(0);
-                player.getCardList().add(card);
-                if(card.getValue().equals(CardValue.ACE)){
-                    player.setContainsAce(true);
-                }
-                setCurrentScore(player);
-                if(round1 && player.getCardScore() >= 6){
-                    player.setBetForThisRound(30);
-                    System.out.println(player.getName() + " bet " + player.getBetForThisRound() + " for this round");
+            if(player.isContinueBetThisRound()){
+                if(round1 || (!player.isBanker() && player.getBetForThisRound() > 0)){
+                    Card card = this.cardList.remove(0);
+                    player.getCardList().add(card);
+                    if(card.getValue().equals(CardValue.ACE)){
+                        player.setContainsAce(true);
+                    }
+                    setCurrentScore(player);
+                    if(round1 && player.getCardScore() >= 6 && !player.isBanker()){
+                        int bankerMoney = this.banker.getMoney();
+                        int playerMoney = player.getMoney();
+                        if(bankerMoney >= (this.alivePlayer-1) * 50 && playerMoney >= 50){
+                           player.setBetForThisRound(50);
+                       }else if(bankerMoney < (this.alivePlayer-1) * 50
+                                && playerMoney >= bankerMoney / (this.alivePlayer-1)){
+                           player.setBetForThisRound(bankerMoney / (this.alivePlayer-1));
+                       }else{
+                           player.setBetForThisRound(playerMoney);
+                       }
+                        System.out.println(player.getName() + " bet " + player.getBetForThisRound() + " for this round");
+                    }else if(round1 && !player.isBanker()){
+                        System.out.println(player.getName() + " get first card less than 6, so choose to fold in this round");
+                    }
                 }
             }
         }
@@ -158,33 +222,6 @@ public class Deck {
             }
     }
 
-    public void printCardSumForPlayer(){
-        for(Player player : this.playerList){
-            if(!player.isBanker()){
-                if(player.isBustThisRound()){
-                    System.out.println("Current score for " + player.getName() + " is " + player.getCardScore() + " which is bust!");
-                }else{
-                    System.out.println("Current score for " + player.getName() + " is " + player.getCardScore());
-                    if(player.isContainsAce()){
-                        System.out.println("Since " + player.getName() + " has Ace, so the score could be " + player.getCardAlternateScore());
-                    }
-                }
-            }
-        }
-    }
-
-    public void printBankerCardSum(){
-        System.out.println("The banker of this round is " + banker.getName());
-        if(this.banker.isBustThisRound()){
-            System.out.println("Banker is bust in this round game");
-        }else{
-            System.out.println("Current score for " + banker.getName() + " is " + banker.getCardScore());
-            if(banker.isContainsAce()){
-                System.out.println("Since " + banker.getName() + " has Ace, so the score could be " + banker.getCardAlternateScore());
-            }
-        }
-    }
-
 
 
     public void initialPlayer(){
@@ -242,6 +279,33 @@ public class Deck {
             }
         }
 
+    }
+
+    public void printCardSumForPlayer(){
+        for(Player player : this.playerList){
+            if(!player.isBanker()){
+                if(player.isBustThisRound()){
+                    System.out.println("Current score for " + player.getName() + " is " + player.getCardScore() + " which is bust!");
+                }else{
+                    System.out.println("Current score for " + player.getName() + " is " + player.getCardScore());
+                    if(player.isContainsAce()){
+                        System.out.println("Since " + player.getName() + " has Ace, so the score could be " + player.getCardAlternateScore());
+                    }
+                }
+            }
+        }
+    }
+
+    public void printBankerCardSum(){
+        System.out.println("The banker of this round is " + banker.getName());
+        if(this.banker.isBustThisRound()){
+            System.out.println("Banker is bust in this round game");
+        }else{
+            System.out.println("Current score for " + banker.getName() + " is " + banker.getCardScore());
+            if(banker.isContainsAce()){
+                System.out.println("Since " + banker.getName() + " has Ace, so the score could be " + banker.getCardAlternateScore());
+            }
+        }
     }
 
 
