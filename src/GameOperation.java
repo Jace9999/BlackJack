@@ -14,4 +14,12 @@ public class GameOperation {
     public GameOperation(int playerNumber){
         this.playerNumber = playerNumber;
     }
+
+    public void initialPlayer(){
+
+    }
+
+    public void startGame(){
+
+    }
 }
