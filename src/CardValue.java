@@ -1,3 +1,10 @@
+/*
+ * @Author Jun Zhu
+ * @Description
+ * Card value enum type
+ * I set the default value of Card Ace is 11, but there is an alternate value for Ace if player contains Ace in the card.
+ * @Date  2022/10/10
+ **/
 public enum CardValue {
     TWO(2),
     THREE(3),
@@ -26,4 +33,5 @@ public enum CardValue {
     CardValue(int value) {
         this.value = value;
     }
+    CardValue() {}
 }

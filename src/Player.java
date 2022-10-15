@@ -1,77 +1,37 @@
-import java.util.List;
-
+/**
+ * @Author: Jun Zhu
+ * @Date: 2022/10/10
+ * @Description: Because every game has players, this class is the parent class of the player class in every game
+ */
 public class Player {
-
     private String name;
-    private int money;
-    private int betForThisRound;
+    private int winTimes;
 
-    private List<Card> cardList;
+    private int stalemateTime;
 
-    private int cardScore;
+    public Player(){
 
-    private int cardAlternateScore;
-    private boolean isBanker;
+    }
 
-    private boolean containsAce;
-
-    private boolean isBustThisRound;
-
-    private boolean continueBetThisRound;
-
-
-    public Player(String name, int money, int betForThisRound, List<Card> cardList, int cardScore, int cardAlternateScore,
-                  boolean isBanker, boolean continueBetThisRound, boolean containsAce, boolean isBustThisRound) {
+    public Player(String name){
         this.name = name;
-        this.money = money;
-        this.betForThisRound = betForThisRound;
-        this.cardList = cardList;
-        this.cardScore = cardScore;
-        this.cardAlternateScore = cardAlternateScore;
-        this.isBanker = isBanker;
-        this.containsAce = containsAce;
-        this.continueBetThisRound = continueBetThisRound;
-        this.isBustThisRound = isBustThisRound;
     }
 
-    public boolean isBustThisRound() {
-        return isBustThisRound;
+    @Override
+    public String toString() {
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", winTimes=" + winTimes +
+                ", stalemateTime=" + stalemateTime +
+                '}';
     }
 
-    public void setBustThisRound(boolean bustThisRound) {
-        isBustThisRound = bustThisRound;
+    public int getStalemateTime() {
+        return stalemateTime;
     }
 
-    public int getCardAlternateScore() {
-        return cardAlternateScore;
-    }
-
-    public void setCardAlternateScore(int cardAlternateScore) {
-        this.cardAlternateScore = cardAlternateScore;
-    }
-
-    public boolean isContainsAce() {
-        return containsAce;
-    }
-
-    public void setContainsAce(boolean containsAce) {
-        this.containsAce = containsAce;
-    }
-
-    public boolean isContinueBetThisRound() {
-        return continueBetThisRound;
-    }
-
-    public void setContinueBetThisRound(boolean continueBetThisRound) {
-        this.continueBetThisRound = continueBetThisRound;
-    }
-
-    public List<Card> getCardList() {
-        return cardList;
-    }
-
-    public void setCardList(List<Card> cardList) {
-        this.cardList = cardList;
+    public void setStalemateTime(int stalemateTime) {
+        this.stalemateTime = stalemateTime;
     }
 
     public String getName() {
@@ -82,35 +42,11 @@ public class Player {
         this.name = name;
     }
 
-    public int getMoney() {
-        return money;
+    public int getWinTimes() {
+        return winTimes;
     }
 
-    public void setMoney(int money) {
-        this.money = money;
-    }
-
-    public int getBetForThisRound() {
-        return betForThisRound;
-    }
-
-    public void setBetForThisRound(int betForThisRound) {
-        this.betForThisRound = betForThisRound;
-    }
-
-    public int getCardScore() {
-        return cardScore;
-    }
-
-    public void setCardScore(int cardScore) {
-        this.cardScore = cardScore;
-    }
-
-    public boolean isBanker() {
-        return isBanker;
-    }
-
-    public void setBanker(boolean banker) {
-        isBanker = banker;
+    public void setWinTimes(int winTimes) {
+        this.winTimes = winTimes;
     }
 }
